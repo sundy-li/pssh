@@ -6,7 +6,26 @@ import (
 	"log"
 	"os/exec"
 	"strings"
+	"sync"
 )
+
+func ExeParallelSSH(hosts []string, cmd string) (err error) {
+	var wg sync.WaitGroup
+	wg.Add(len(hosts))
+	for _, h := range hosts {
+		go func(h, cmd string) {
+			defer func() {
+				if e := recover(); e != nil {
+				}
+				wg.Done()
+			}()
+
+			ExeSSH(h, cmd)
+		}(h, cmd)
+	}
+	wg.Wait()
+	return nil
+}
 
 func ExeSSH(host string, command string) (err error) {
 	args := []string{}
@@ -40,7 +59,9 @@ func ExeSSH(host string, command string) (err error) {
 
 	strs := strings.Split(string(slurt), "\n")
 	for _, str := range strs {
-		fmt.Printf("[%s] result: %s\n", host, str)
+		if len(str) > 0 {
+			fmt.Printf("[%s]: %s\n", host, str)
+		}
 	}
 	if err = cmd.Wait(); err != nil {
 		return

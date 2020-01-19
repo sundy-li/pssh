@@ -2,15 +2,15 @@ package main
 
 import (
 	"github.com/sundy-li/pssh"
+	"log"
 )
 
 func main() {
 	options := pssh.Options
 
-	for _, h := range options.Hosts {
-		err := pssh.ExeSSH(h, options.Cmd)
-		if err != nil {
-			println("ERROR IN ssh ", err.Error())
-		}
+	log.Printf("hosts -> %v", options.Hosts)
+	err := pssh.ExeParallelSSH(options.Hosts, options.Cmd)
+	if err != nil {
+		log.Fatal("ERROR IN ssh ", err.Error())
 	}
 }

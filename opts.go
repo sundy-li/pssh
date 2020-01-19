@@ -2,12 +2,22 @@ package pssh
 
 import "flag"
 
+import "os"
+
+import "log"
+
+import "io/ioutil"
+
+import "strings"
+
 type (
 	Hosts []string
-
-	Opts struct {
-		Hosts Hosts
-		Cmd   string
+	Opts  struct {
+		Hosts        Hosts
+		Hostfile     string
+		Cmd          string
+		AnsibleFile  string
+		AnsibleGroup string
 	}
 )
 
@@ -25,7 +35,44 @@ var (
 )
 
 func init() {
-	flag.Var(&Options.Hosts, "host", "host to execute the commands")
-	flag.StringVar(&Options.Cmd, "cmd", "", "execute commands")
+	flag.Var(&Options.Hosts, "h", "host to execute the commands")
+	flag.StringVar(&Options.Hostfile, "f", "", "hosts files")
+	flag.StringVar(&Options.Cmd, "c", "", "execute commands")
+	flag.StringVar(&Options.AnsibleFile, "a", "/etc/ansible/hosts", "ansible file path")
+	flag.StringVar(&Options.AnsibleGroup, "g", "", "ansible hosts group")
+
 	flag.Parse()
+
+	Options.initConfig()
+}
+
+func (opt *Opts) initConfig() {
+	if opt.Hostfile != "" {
+		fp, err := os.Open(opt.Hostfile)
+		if err != nil {
+			log.Fatalf("Hostfile %s open error:%s", opt.Hostfile, err.Error())
+		}
+		bs, _ := ioutil.ReadAll(fp)
+		for _, str := range strings.Split(string(bs), "\n") {
+			h := strings.TrimSpace(str)
+			if len(h) > 0 {
+				opt.Hosts = append(opt.Hosts, h)
+			}
+		}
+	}
+
+	if opt.AnsibleFile != "" && opt.AnsibleGroup != "" {
+		hosts, err := ParseAnisbleHost(opt.AnsibleFile)
+		if err != nil {
+			log.Fatalf("Parsing ansible file error:%s", err.Error())
+		}
+		groups := strings.Split(opt.AnsibleGroup, ",")
+		for _, g := range groups {
+			if hs, ok := hosts[strings.TrimSpace(g)]; ok {
+				opt.Hosts = append(opt.Hosts, hs...)
+			} else {
+				log.Fatalf("Not found group %s", g)
+			}
+		}
+	}
 }
