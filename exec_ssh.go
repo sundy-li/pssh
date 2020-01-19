@@ -36,7 +36,6 @@ func ExeSSH(host string, command string) (err error) {
 	args = append(args, host)
 	args = append(args, command)
 
-	// fmt.Printf("ssh %v", args)
 	cmd := exec.Command("ssh", args...)
 
 	stderr, err := cmd.StderrPipe()

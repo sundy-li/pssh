@@ -1,14 +1,12 @@
 package pssh
 
-import "flag"
-
-import "os"
-
-import "log"
-
-import "io/ioutil"
-
-import "strings"
+import (
+	"flag"
+	"io/ioutil"
+	"log"
+	"os"
+	"strings"
+)
 
 type (
 	Hosts []string

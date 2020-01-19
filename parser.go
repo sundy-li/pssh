@@ -22,16 +22,17 @@ func ParseAnisbleHost(fp string) (hosts map[string][]string, err error) {
 		if strings.Index(str, "#") == 0 || len(str) == 0 {
 			continue
 		} else if strings.Index(str, "[") == 0 && strings.Index(str, "]") == len(str)-1 {
-			hosts[key] = keyHosts
-
+			hosts[key] = keyHosts[:len(keyHosts)]
 			key = str[1 : len(str)-1]
-			keyHosts = keyHosts[:0]
+			keyHosts = []string{}
 		} else {
 			keyHosts = append(keyHosts, str)
 		}
 	}
-	if len(keyHosts) > 0 {
-		hosts[key] = keyHosts
+
+	if _, ok := hosts[key]; !ok {
+		hosts[key] = keyHosts[:len(keyHosts)]
 	}
+
 	return
 }
