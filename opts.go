@@ -24,7 +24,10 @@ func (i *Hosts) String() string {
 }
 
 func (i *Hosts) Set(value string) error {
-	*i = append(*i, value)
+	hosts := strings.Split(value, ",")
+	for _, h := range hosts {
+		*i = append(*i, strings.TrimSpace(h))
+	}
 	return nil
 }
 
