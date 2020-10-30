@@ -1,4 +1,11 @@
 # pssh
+
+
+## Install
+Download from [Release](https://github.com/sundy-li/pssh/releases)
+
+
+## By Source
 ```
 make install
 pssh -host h1  -host h2 -c "ls -a"
