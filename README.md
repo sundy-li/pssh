@@ -2,19 +2,20 @@
 
 
 ## Install
-Download from [Release](https://github.com/sundy-li/pssh/releases)
 
+- Binary: Download from [Release](https://github.com/sundy-li/pssh/releases)
+- By source code: `make install`
 
-## By Source
+## Simple usage
+
 ```
-make install
 pssh -host h1  -host h2 -c "ls -a"
 ```
 
-## ansible group support
+## Ansible group support
 
 ```
-pssh -a ansible_file -g oneid -c "sudo tail -100  /data/services/oneid-0.0.26/admin/start.log | grep rpc | grep 14:3"
+pssh -a ansible_file -g oneid -c "hostname"
 ```
 
 - `ansible_file` is ansible format file,defaults to `/etc/ansible/hosts`, eg:
@@ -27,9 +28,14 @@ pssh -a ansible_file -g oneid -c "sudo tail -100  /data/services/oneid-0.0.26/ad
 
 [clickhouse]
 10.221.112.153
+10.221.112.157
+10.221.112.159
 10.221.112.154
-10.221.112.153
-10.221.112.154
+```
+
+## pssh with rsync
+```
+    pssh rsync -g clickhouse  -s dist -d /data1/
 ```
 
 ## More information

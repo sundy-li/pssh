@@ -8,14 +8,24 @@ import (
 	"strings"
 )
 
+const (
+	ActionShell = "shell"
+	ActionRsync = "rsync"
+)
+
 type (
 	Hosts []string
 	Opts  struct {
 		Hosts        Hosts
 		Hostfile     string
+		Action       string
 		Cmd          string
 		AnsibleFile  string
 		AnsibleGroup string
+
+		//for rsync
+		SrcPath string
+		DstPath string
 	}
 )
 
@@ -36,13 +46,33 @@ var (
 )
 
 func init() {
-	flag.Var(&Options.Hosts, "h", "host to execute the commands")
-	flag.StringVar(&Options.Hostfile, "f", "", "hosts files")
-	flag.StringVar(&Options.Cmd, "c", "", "execute commands")
-	flag.StringVar(&Options.AnsibleFile, "a", "/etc/ansible/hosts", "ansible file path")
-	flag.StringVar(&Options.AnsibleGroup, "g", "", "ansible hosts group")
+	var argsStart = 0
+	Options.Action = ActionShell
+	if len(os.Args) >= 2 {
+		switch os.Args[1] {
+		case ActionRsync:
+			Options.Action = ActionRsync
+			argsStart = 1
+		case ActionShell:
+			Options.Action = ActionShell
+		}
+	}
 
-	flag.Parse()
+	var flagSet = flag.NewFlagSet(os.Args[argsStart], flag.ExitOnError)
+
+	flagSet.Var(&Options.Hosts, "h", "host to execute the commands")
+	flagSet.StringVar(&Options.Hostfile, "f", "", "hosts files")
+	flagSet.StringVar(&Options.Cmd, "c", "", "execute commands")
+	flagSet.StringVar(&Options.AnsibleFile, "a", "/etc/ansible/hosts", "ansible file path")
+	flagSet.StringVar(&Options.AnsibleGroup, "g", "", "ansible hosts group")
+
+	flagSet.StringVar(&Options.SrcPath, "s", "", "rsync source path")
+	flagSet.StringVar(&Options.DstPath, "d", "", "rsync dist path")
+
+	err := flagSet.Parse(os.Args[argsStart+1:])
+	if err != nil {
+		panic(err)
+	}
 
 	Options.initConfig()
 }
