@@ -67,7 +67,7 @@ func init() {
 	flagSet.StringVar(&Options.AnsibleGroup, "g", "", "ansible hosts group")
 
 	flagSet.StringVar(&Options.SrcPath, "s", "", "rsync source path")
-	flagSet.StringVar(&Options.DstPath, "d", "", "rsync dist path")
+	flagSet.StringVar(&Options.DstPath, "d", "", "rsync dest path")
 
 	err := flagSet.Parse(os.Args[argsStart+1:])
 	if err != nil {
